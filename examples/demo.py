@@ -3,6 +3,7 @@ import pyopencl
 import pyopencl.tools
 import pyopencl.array
 import numpy as np
+import time
 
 
 if __name__ == '__main__':
@@ -53,16 +54,31 @@ if __name__ == '__main__':
     beam_arg = pyopencl.array.to_device(queue, beam_buffer.particle_set_buffer)
 
     # Prepare compiling the programs
-    track_global_prg = dt.get_track_particle_program( ctx, particles="global" )
+    particles_memory = "global"
+    has_spacecharge = False
+    track_prg = dt.get_track_particle_program(
+        ctx, particles=particles_memory, has_spacecharge=has_spacecharge)
 
     until_turn=np.int64(100)
-    track_ev = track_global_prg.Track_particle_global(
+
+    start_time = time.perf_counter()
+    track_ev = track_prg.Track_particle(
         queue, (50*1024,), None,
         beam_arg.data, num_particles,
         lattice_arg.data, num_slots_in_buffer, until_turn, )
 
     track_ev.wait()
+    stop_time = time.perf_counter()
+
+    print( f"Elapsed time: {stop_time - start_time} sec" )
     beam_arg.get(queue,beam_buffer.particle_set_buffer)
+
+
+    for ii in range( 0, num_particles):
+        if beam_buffer.particle_set_buffer[ ii ][ "state" ] == 1:
+            assert beam_buffer.particle_set_buffer[ ii ][ "at_turn" ] == until_turn
+            assert beam_buffer.particle_set_buffer[ ii ][ "at_element" ] == 0
+
 
 
 
