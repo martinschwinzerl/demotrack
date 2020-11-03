@@ -9,10 +9,10 @@ void get_transv_field_gauss_round(
     double const Delta_y, double const x, double const y,
     double* restrict Ex, double* restrict Ey );
 
-void get_transv_field_gauss_ellip( 
+void get_transv_field_gauss_ellip(
     double const sigma_x, double const sigma_y,
     double const Delta_x, double const Delta_y,
-    double const x, double const y, 
+    double const x, double const y,
     double* restrict Ex, double* restrict Ey );
 
 void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
@@ -116,10 +116,10 @@ void get_transv_field_gauss_round(
   (*Ey_out) = temp * (y-Delta_y);
 }
 
-void get_transv_field_gauss_ellip( 
+void get_transv_field_gauss_ellip(
     double const sigma_x, double const sigma_y,
     double const Delta_x, double const Delta_y,
-    double const x, double const y, 
+    double const x, double const y,
     double* restrict Ex_out, double* restrict Ey_out )
 {
   double sigmax = sigma_x;
@@ -132,7 +132,7 @@ void get_transv_field_gauss_ellip(
   double etaBE_re, etaBE_im, zetaBE_re, zetaBE_im;
   double w_etaBE_re, w_etaBE_im, w_zetaBE_re, w_zetaBE_im;
   double expBE;
-  
+
   double const SQRT_PI = ( double )1.7724538509055160273;
   double const EPSILON_0 = ( double )8.854187817620e-12;
 
@@ -172,7 +172,7 @@ void get_transv_field_gauss_ellip(
     Ey = factBE*(w_zetaBE_im - w_etaBE_im*expBE);
     Ex = factBE*(w_zetaBE_re - w_etaBE_re*expBE);
   }
-  
+
   if((x - Delta_x)<0) Ex=-Ex;
   if((y - Delta_y)<0) Ey=-Ey;
 
@@ -188,7 +188,7 @@ void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
 {
     double const PI = ( double )3.141592653589793;
     double const EPSILON_0 = ( double )8.854187817620e-12;
-    
+
     double Ex, Ey, Gx, Gy;
 
     if (fabs(sigma_x-sigma_y)< min_sigma_diff){
