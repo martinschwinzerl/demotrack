@@ -85,6 +85,8 @@ def get_track_particle_program(ctx, particles="global", has_spacecharge=False):
                 __private Particle p = pset[ part_idx ];
                 Track_particle_until_turn( &p, beam_elements_buffer,
                     num_slots_in_buffer, until_turn );
+
+                pset[ part_idx ] = p;
             }
         }
         """
