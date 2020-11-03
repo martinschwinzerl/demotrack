@@ -1,7 +1,7 @@
 #ifndef DEMOTRACK_SPACE_CHARGE_H__
 #define DEMOTRACK_SPACE_CHARGE_H__
 
-void void cerrf( double const in_real, double const in_imag,
+void cerrf( double const in_real, double const in_imag,
     double* restrict out_real, double* restrict out_imag );
 
 void get_transv_field_gauss_round(
@@ -23,7 +23,7 @@ void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
 
 /* ************************************************************************* */
 
-void void cerrf( double const in_real, double const in_imag,
+void cerrf( double const in_real, double const in_imag,
     double* restrict out_real, double* restrict out_imag )
 {
     /* This function calculates the double precision complex error fnct.
@@ -47,7 +47,7 @@ void void cerrf( double const in_real, double const in_imag,
         q = (1.0 - y / yLim) * sqrt(1.0 - (x / xLim) * (x / xLim));
         h  = 1.0 / (3.2 * q);
         nc = 7 + (int) (23.0 * q);
-        xl = pow(h, (SIXTRL_REAL_T) (1 - nc));
+        xl = pow(h, (double) (1 - nc));
         xh = y + 0.5 / h;
         yh = x;
         nu = 10 + (int) (21.0 * q);
@@ -102,7 +102,7 @@ void void cerrf( double const in_real, double const in_imag,
 void get_transv_field_gauss_round(
     double const sigma, double const Delta_x,
     double const Delta_y, double const x, double const y,
-    double* restrict Ex, double* restrict Ey )
+    double* restrict Ex_out, double* restrict Ey_out )
 {
   double r2, temp;
   double const PI = ( double )3.141592653589793;
@@ -112,15 +112,15 @@ void get_transv_field_gauss_round(
   if (r2<1e-20) temp = sqrt(r2)/(2.*PI*EPSILON_0*sigma); //linearised
   else          temp = (1-exp(-0.5*r2/(sigma*sigma)))/(2.*PI*EPSILON_0*r2);
 
-  (*Ex) = temp * (x-Delta_x);
-  (*Ey) = temp * (y-Delta_y);
+  (*Ex_out) = temp * (x-Delta_x);
+  (*Ey_out) = temp * (y-Delta_y);
 }
 
 void get_transv_field_gauss_ellip( 
     double const sigma_x, double const sigma_y,
     double const Delta_x, double const Delta_y,
     double const x, double const y, 
-    double* restrict Ex, double* restrict Ey )
+    double* restrict Ex_out, double* restrict Ey_out )
 {
   double sigmax = sigma_x;
   double sigmay = sigma_y;
@@ -195,7 +195,7 @@ void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
 
         double sigma = 0.5*(sigma_x+sigma_y);
 
-        NS(get_transv_field_gauss_round)(sigma, 0., 0., x, y, &Ex, &Ey);
+        get_transv_field_gauss_round(sigma, 0., 0., x, y, &Ex, &Ey);
 
         if(skip_Gs){
           Gx = 0.;
@@ -211,11 +211,11 @@ void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
     }
     else{
 
-        NS(get_transv_field_gauss_ellip)(
+        get_transv_field_gauss_ellip(
                 sigma_x, sigma_y, 0., 0., x, y, &Ex, &Ey);
 
-        SIXTRL_REAL_T Sig_11 = sigma_x*sigma_x;
-        SIXTRL_REAL_T Sig_33 = sigma_y*sigma_y;
+        double Sig_11 = sigma_x*sigma_x;
+        double Sig_33 = sigma_y*sigma_y;
 
         if(skip_Gs){
           Gx = 0.;

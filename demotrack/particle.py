@@ -21,19 +21,15 @@ class ParticleSet(object):
         E0 = np.sqrt( p0c * p0c + mass0 * mass0 )
         beta0 = p0c / E0
         gamma0 = E0 / mass0
-        delta = float( 0.0 )
-        
-        ptau = np.sqrt( delta * delta + 2 * delta + 1 / ( beta0 * beta0 ) ) 
-        ptau -= 1 / beta0
-        psigma = ptau / beta0
-        
+        _delta = float( 0.0 )
+                        
         self.particle_set_buffer = np.empty( num_particles, dtype=Particle )
         self.particle_set_buffer[ "x" ].fill( 0.0 )
         self.particle_set_buffer[ "px" ].fill( 0.0 )
         self.particle_set_buffer[ "y" ].fill( 0.0 )
         self.particle_set_buffer[ "py" ].fill( 0.0 )
         self.particle_set_buffer[ "zeta" ].fill( 0.0 )
-        self.particle_set_buffer[ "delta" ].fill( delta )                
+        self.particle_set_buffer[ "delta" ].fill( _delta )                
         self.particle_set_buffer[ "chi" ].fill( 1.0 )
         self.particle_set_buffer[ "charge_ratio" ].fill( 1.0 )
         self.particle_set_buffer[ "rvv" ].fill( 1.0 )
@@ -49,7 +45,7 @@ class ParticleSet(object):
         
         for ii in range( 0, num_particles ):
             self.particle_set_buffer[ ii ][ "id" ] = ii
-            self.particle_set_buffer.set_delta( 0.0, ii )
+            self.set_delta( _delta, ii )
             
     def set_delta(self, _delta, ii ):
         beta0 = self.particle_set_buffer[ "beta0" ][ ii ]

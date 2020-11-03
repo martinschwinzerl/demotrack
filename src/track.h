@@ -99,8 +99,8 @@ void Cavity_track( BE_ARGPTR_DEC const Cavity *const restrict cavity,
     PARTICLE_ARGPTR_DEC Particle* restrict p )
 {
     double const PI = ( double )3.141592653589793;    
-    double const phase = ( PI / ( real_t )180 ) * cavity->lag -
-        ( ( ( real_t )2 * PI ) / ( double )299792458.0 ) * 
+    double const phase = ( PI / ( double )180 ) * cavity->lag -
+        ( ( ( double )2 * PI ) / ( double )299792458.0 ) * 
         ( p->zeta / ( p->beta0 * p->rvv ) ) * cavity->frequency;
            
     Particle_add_to_energy( p, 
@@ -121,11 +121,11 @@ void SpaceChargeCoasting_track(
     
     double fact_kick = sc_elem->number_of_particles * 
         sc_elem->length * p->chi * p->charge_ratio * charge * charge *
-        ( ( double )1 - p->beta0 * beta0 );
+        ( ( double )1 - p->beta0 * p->beta0 );
 
     fact_kick /= sc_elem->circumference * p0c * p->beta0 * p->rvv;
 
-    NS(get_Ex_Ey_Gx_Gy_gauss)( p->x - sc_elem->x_co, p->y - sc_elem->y_co,
+    get_Ex_Ey_Gx_Gy_gauss( p->x - sc_elem->x_co, p->y - sc_elem->y_co,
         sc_elem->sigma_x, sc_elem->sigma_y, sc_elem->min_sigma_diff, 
         ( int )1, &Ex, &Ey, &Gx, &Gy );
 
@@ -202,7 +202,7 @@ unsigned int Track_beam_element_dispatcher(
     
     if( next_slot_idx < num_slots_in_beam_elements_buffer )
     {
-        p->at_element_id++;
+        p->at_element++;
     }
     else
     {
@@ -223,7 +223,7 @@ void Track_particle_until_turn( PARTICLE_ARGPTR_DEC Particle* restrict p,
     while( ( p->at_turn < until_turn ) && ( p->state == 1 ) )
     {
         unsigned int idx = ( unsigned int )0;
-        p->at_element_id = 0;
+        p->at_element = 0;
         
         while( ( p->state == 1 ) && 
                ( idx < num_slots_in_beam_elements_buffer ) )
@@ -234,7 +234,7 @@ void Track_particle_until_turn( PARTICLE_ARGPTR_DEC Particle* restrict p,
 
         if( p->state == 1 )
         {
-            p->at_element_id = 0;
+            p->at_element = 0;
             p->at_turn++;
         }
     }
