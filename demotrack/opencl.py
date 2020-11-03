@@ -55,7 +55,7 @@ def get_track_particle_program(ctx, particles="global", has_spacecharge=False):
     #include "space_charge.h"
     #include "track.h"
 
-    __kernel void Track_particle_global(
+    __kernel void Track_particle(
         PARTICLE_ARGPTR_DEC Particle* restrict pset,
         long int const num_particles,
         BE_ARGPTR_DEC double const* restrict beam_elements_buffer,
