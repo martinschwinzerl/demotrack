@@ -47,7 +47,6 @@ if __name__ == '__main__':
     lattice_arg = pyopencl.array.to_device(queue,lattice_buffer)
     num_slots_in_buffer = np.int64(len(lattice_buffer))
 
-
     # Setup particle beam -> argument for OpenCL kernels:
     num_particles = np.int64(50 * 1024)
     beam_buffer = dt.ParticleSet( num_particles=num_particles, p0c=1e9 )
