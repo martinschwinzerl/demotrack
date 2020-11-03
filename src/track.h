@@ -234,8 +234,11 @@ void Track_particle_until_turn( PARTICLE_ARGPTR_DEC Particle* restrict p,
         while( ( p->state == 1 ) &&
                ( idx < num_slots_in_beam_elements_buffer ) )
         {
-            idx = Track_beam_element_dispatcher( p, beam_elements_buffer,
-                    idx, num_slots_in_beam_elements_buffer );
+            unsigned int const next_idx = Track_beam_element_dispatcher(
+                p, beam_elements_buffer, idx,
+                num_slots_in_beam_elements_buffer );
+
+            idx = next_idx;
         }
 
         if( p->state == 1 )
