@@ -21,6 +21,10 @@ void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
     double* restrict Ex_ptr, double* restrict Ey_ptr,
     double* restrict Gx_ptr, double* restrict Gy_ptr);
 
+void SpaceChargeCoasting_track(
+    BE_ARGPTR_DEC const SpaceChargeCoasting *const restrict cavity,
+    PARTICLE_ARGPTR_DEC Particle* restrict p );
+
 /* ************************************************************************* */
 
 void cerrf( double const in_real, double const in_imag,
@@ -237,6 +241,32 @@ void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
         *Gx_ptr = Gx;
         *Gy_ptr = Gy;
     }
+}
+
+void SpaceChargeCoasting_track(
+    BE_ARGPTR_DEC const SpaceChargeCoasting *const restrict sc_elem,
+    PARTICLE_ARGPTR_DEC Particle* restrict p )
+{
+    double Ex;
+    double Ey;
+    double Gx;
+    double Gy;
+
+    double const charge = ( double )1.602176634e-19 * p->q0;
+    double const p0c = ( double )1.602176634e-19 * p->p0c;
+
+    double fact_kick = sc_elem->number_of_particles *
+        sc_elem->length * p->chi * p->charge_ratio * charge * charge *
+        ( ( double )1 - p->beta0 * p->beta0 );
+
+    fact_kick /= sc_elem->circumference * p0c * p->beta0 * p->rvv;
+
+    get_Ex_Ey_Gx_Gy_gauss( p->x - sc_elem->x_co, p->y - sc_elem->y_co,
+        sc_elem->sigma_x, sc_elem->sigma_y, sc_elem->min_sigma_diff,
+        ( int )1, &Ex, &Ey, &Gx, &Gy );
+
+    p->px += fact_kick * Ex;
+    p->py += fact_kick * Ey;
 }
 
 #endif /* DEMOTRACK_SPACE_CHARGE_H__ */
