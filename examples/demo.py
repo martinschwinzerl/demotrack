@@ -3,45 +3,7 @@ import pyopencl
 import pyopencl.tools
 import pyopencl.array
 import numpy as np
-import os
 
-def get_track_particle_program_global(ctx, cl_Particle_cdecl):
-    base_path = os.path.dirname( dt.__file__ )
-    path_to_src_dir = os.path.join( base_path, os.pardir, "src" )
-    
-    src = f"""
-    #define BE_ARGPTR_DEC __global 
-    #define PARTICLE_ARGPTR_DEC __global
-    
-    #include "particle.h"
-    #include "beam_elements.h"
-    #include "space_charge.h"
-    #include "track.h"
-    
-    __kernel void Track_particle_global(
-        PARTICLE_ARGPTR_DEC Particle* restrict pset, 
-        long int const num_particles,
-        BE_ARGPTR_DEC double const* restrict beam_elements_buffer, 
-        long int const num_slots_in_buffer, 
-        long int const until_turn )"""
-    
-    src += """
-    {
-        long int part_idx = ( long int )get_global_id( 0 );
-    
-        for( ; part_idx < num_particles ; part_idx += get_global_size( 0 ) )
-        {        
-            __global Particle* p = &pset[ part_idx ];
-            Track_particle_until_turn( p, beam_elements_buffer,
-                num_slots_in_buffer, until_turn );
-        }
-    }    
-    """
-    
-    prg = pyopencl.Program( ctx, src )
-    prg.build( options=[ f"-I {path_to_src_dir}" ] )
-    
-    return prg
 
 if __name__ == '__main__':
     ctx, cl_Particle, cl_Particle_cdecl = dt.setup_pyopencl_ctx(
@@ -92,13 +54,18 @@ if __name__ == '__main__':
     beam_arg = pyopencl.array.to_device(queue, beam_buffer.particle_set_buffer)
     
     # Prepare compiling the programs
-    track_global_prg = get_track_particle_program_global( ctx, cl_Particle_cdecl)
+    track_global_prg = dt.get_track_particle_program( ctx, particles="global" )
            
     until_turn=np.int64(100)
     track_ev = track_global_prg.Track_particle_global(
         queue, (50*1024,), None, 
         beam_arg.data, num_particles, 
         lattice_arg.data, num_slots_in_buffer, until_turn, )
+    
+    track_ev.wait()
+    beam_arg.get(queue,beam_buffer.particle_set_buffer)
+    
+    
     
     
                                  
