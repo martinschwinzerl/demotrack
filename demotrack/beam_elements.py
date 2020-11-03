@@ -5,10 +5,10 @@ class Lattice(object):
     def __init__(self):
         self._slots = []
         self.packed_buffer = None
-        
+
     def add_drift(self, length):
-        self._slots.extend( [ float( 0 ), float( length ) ] )
-    
+        self._slots.extend( [ float( 3 ), float( length ) ] )
+
     def add_multipole( self, order=0, length=0.0, knl=None, ksl=None ):
         if knl is None:
             knl = []
@@ -42,22 +42,22 @@ class Lattice(object):
         inv_factorial = 1.0 / factorial(idx, exact=True)
         bal[0::2] = knl * inv_factorial
         bal[1::2] = ksl * inv_factorial
-        
+
         stored_bal = np.zeros( 16 )
         stored_bal[0:len(bal)] = bal
 
-        self._slots.extend( [ float( 1 ), float( order ), float( length ) ] )
+        self._slots.extend( [ float( 4 ), float( order ), float( length ) ] )
         self._slots.extend( [ *stored_bal ] )
-    
+
     def add_cavity(self, voltage, frequency, lag ):
-        self._slots.extend( [ float( 2 ), float( voltage ) , float( frequency ), float( lag ) ] )
-        
+        self._slots.extend( [ float( 5 ), float( voltage ) , float( frequency ), float( lag ) ] )
+
     def pack(self):
         return np.array( self._slots )
-    
+
     def num_slots(self):
         return len( self._slots ) if self._slots is not None else 0
-    
+
     def clear(self):
         self._slots = []
 

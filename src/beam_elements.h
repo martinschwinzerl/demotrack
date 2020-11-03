@@ -1,18 +1,18 @@
 #ifndef DEMOTRACK_BEAM_ELEMENTS_H__
 #define DEMOTRACK_BEAM_ELEMENTS_H__
 
-typedef enum 
+typedef enum
 {
-    BEAM_ELEMENT_DRIFT = 0,
-    BEAM_ELEMENT_MULTIPOLE = 1, 
-    BEAM_ELEMENT_CAVITY = 2, 
-    BEAM_ELEMENT_SC_COASTING = 3
+    BEAM_ELEMENT_DRIFT = 3,
+    BEAM_ELEMENT_MULTIPOLE = 4,
+    BEAM_ELEMENT_CAVITY = 5,
+    BEAM_ELEMENT_SC_COASTING = 16
 }
 beam_element_type;
 
 typedef struct Drift
 {
-    double type_id;    
+    double type_id;
     double length;
 }
 Drift;
@@ -21,7 +21,7 @@ typedef struct Multipole
 {
     double type_id;
     double order;
-    double length;    
+    double length;
     double bal[ 16 ];
 }
 Multipole;
@@ -53,7 +53,7 @@ SpaceChargeCoasting;
 typedef enum
 {
     NUM_SLOTS_DRIFT = 2,
-    NUM_SLOTS_MULTIPOLE = 18,
+    NUM_SLOTS_MULTIPOLE = 19,
     NUM_SLOTS_CAVITY = 4,
     NUM_SLOTS_SC_COASTING = 10
 }
