@@ -1,34 +1,36 @@
 #ifndef DEMOTRACK_SPACE_CHARGE_H__
 #define DEMOTRACK_SPACE_CHARGE_H__
 
-void cerrf( double const in_real, double const in_imag,
-    double* restrict out_real, double* restrict out_imag );
+DEMOTRACK_STATIC DEMOTRACK_FN void cerrf(
+    double const in_real, double const in_imag,
+    double* out_real, double* out_imag );
 
-void get_transv_field_gauss_round(
+DEMOTRACK_STATIC DEMOTRACK_FN void get_transv_field_gauss_round(
     double const sigma, double const Delta_x,
     double const Delta_y, double const x, double const y,
-    double* restrict Ex, double* restrict Ey );
+    double* Ex, double* Ey );
 
-void get_transv_field_gauss_ellip(
+DEMOTRACK_STATIC DEMOTRACK_FN void get_transv_field_gauss_ellip(
     double const sigma_x, double const sigma_y,
     double const Delta_x, double const Delta_y,
     double const x, double const y,
-    double* restrict Ex, double* restrict Ey );
+    double* Ex, double* Ey );
 
-void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
+DEMOTRACK_STATIC DEMOTRACK_FN void get_Ex_Ey_Gx_Gy_gauss(
+    double const x, double const y,
     double const sigma_x, double const sigma_y,
     double const min_sigma_diff, int skip_Gs,
-    double* restrict Ex_ptr, double* restrict Ey_ptr,
-    double* restrict Gx_ptr, double* restrict Gy_ptr);
+    double* Ex_ptr, double* Ey_ptr,
+    double* Gx_ptr, double* Gy_ptr);
 
-void SpaceChargeCoasting_track(
-    BE_ARGPTR_DEC const SpaceChargeCoasting *const restrict cavity,
-    PARTICLE_ARGPTR_DEC Particle* restrict p );
+DEMOTRACK_STATIC DEMOTRACK_FN void SpaceChargeCoasting_track(
+    BE_ARGPTR_DEC const SpaceChargeCoasting *const cavity,
+    PARTICLE_ARGPTR_DEC Particle* p );
 
 /* ************************************************************************* */
 
-void cerrf( double const in_real, double const in_imag,
-    double* restrict out_real, double* restrict out_imag )
+DEMOTRACK_INLINE void cerrf( double const in_real, double const in_imag,
+    double* out_real, double* out_imag )
 {
     /* This function calculates the double precision complex error fnct.
     based on the algorithm of the FORTRAN function written at CERN by K. Koelbig
@@ -103,10 +105,10 @@ void cerrf( double const in_real, double const in_imag,
     *out_imag = Wy;
 }
 
-void get_transv_field_gauss_round(
+DEMOTRACK_INLINE void get_transv_field_gauss_round(
     double const sigma, double const Delta_x,
     double const Delta_y, double const x, double const y,
-    double* restrict Ex_out, double* restrict Ey_out )
+    double* Ex_out, double* Ey_out )
 {
   double r2, temp;
   double const PI = ( double )3.141592653589793;
@@ -120,11 +122,11 @@ void get_transv_field_gauss_round(
   (*Ey_out) = temp * (y-Delta_y);
 }
 
-void get_transv_field_gauss_ellip(
+DEMOTRACK_INLINE void get_transv_field_gauss_ellip(
     double const sigma_x, double const sigma_y,
     double const Delta_x, double const Delta_y,
     double const x, double const y,
-    double* restrict Ex_out, double* restrict Ey_out )
+    double* Ex_out, double* Ey_out )
 {
   double sigmax = sigma_x;
   double sigmay = sigma_y;
@@ -184,11 +186,11 @@ void get_transv_field_gauss_ellip(
   (*Ey_out) = Ey;
 }
 
-void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
+DEMOTRACK_INLINE void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
     double const sigma_x, double const sigma_y,
     double const min_sigma_diff, int skip_Gs,
-    double* restrict Ex_ptr, double* restrict Ey_ptr,
-    double* restrict Gx_ptr, double* restrict Gy_ptr)
+    double* Ex_ptr, double* Ey_ptr,
+    double* Gx_ptr, double* Gy_ptr)
 {
     double const PI = ( double )3.141592653589793;
     double const EPSILON_0 = ( double )8.854187817620e-12;
@@ -243,9 +245,9 @@ void get_Ex_Ey_Gx_Gy_gauss( double const x, double const y,
     }
 }
 
-void SpaceChargeCoasting_track(
-    BE_ARGPTR_DEC const SpaceChargeCoasting *const restrict sc_elem,
-    PARTICLE_ARGPTR_DEC Particle* restrict p )
+DEMOTRACK_INLINE void SpaceChargeCoasting_track(
+    BE_ARGPTR_DEC const SpaceChargeCoasting *const sc_elem,
+    PARTICLE_ARGPTR_DEC Particle* p )
 {
     double Ex;
     double Ey;

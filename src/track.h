@@ -5,49 +5,40 @@
 #include "space_charge.h"
 #include "particle.h"
 
-#if !defined( BE_ARGPTR_DEC )
-    #define BE_ARGPTR_DEC __global
-#endif /* !defined( BE_ARGPTR_DEC ) */
+DEMOTRACK_STATIC DEMOTRACK_FN void Drift_track(
+    BE_ARGPTR_DEC const Drift *const  drift,
+    PARTICLE_ARGPTR_DEC Particle*  p );
 
-#if !defined( PARTICLE_ARGPTR_DEC )
-    #define PARTICLE_ARGPTR_DEC __global
-#endif /* !defined( PARTICLE_ARGPTR_DEC ) */
+DEMOTRACK_STATIC DEMOTRACK_FN void LimitGlobal_track(
+    PARTICLE_ARGPTR_DEC Particle*  p );
 
-#if !defined( ENABLE_SPACECHARGE )
-    #define ENABLE_SPACECHARGE 0
-#endif /* !defined( ENABLE_SPACECHARGE ) */
+DEMOTRACK_STATIC DEMOTRACK_FN void Multipole_track(
+    BE_ARGPTR_DEC const Multipole *const  quad,
+    PARTICLE_ARGPTR_DEC Particle*  p );
 
-void Drift_track( BE_ARGPTR_DEC const Drift *const restrict drift,
-    PARTICLE_ARGPTR_DEC Particle* restrict p );
-
-void LimitGlobal_track( PARTICLE_ARGPTR_DEC Particle* restrict p );
-
-void Multipole_track(
-    BE_ARGPTR_DEC const Multipole *const restrict quad,
-    PARTICLE_ARGPTR_DEC Particle* restrict p );
-
-void Cavity_track(
-    BE_ARGPTR_DEC const Cavity *const restrict cavity,
-    PARTICLE_ARGPTR_DEC Particle* restrict p );
+DEMOTRACK_STATIC DEMOTRACK_FN void Cavity_track(
+    BE_ARGPTR_DEC const Cavity *const  cavity,
+    PARTICLE_ARGPTR_DEC Particle*  p );
 
 /* ------------------------------------------------------------------------- */
 
-unsigned int Track_beam_element_dispatcher(
-    PARTICLE_ARGPTR_DEC Particle* restrict p,
-    BE_ARGPTR_DEC double const* restrict beam_elements_buffer,
+DEMOTRACK_STATIC DEMOTRACK_FN unsigned int Track_beam_element_dispatcher(
+    PARTICLE_ARGPTR_DEC Particle*  p,
+    BE_ARGPTR_DEC double const*  beam_elements_buffer,
     unsigned int const current_slot_idx,
     unsigned int const num_slots_in_beam_elements_buffer );
 
-void Track_particle_until_turn(
-    PARTICLE_ARGPTR_DEC Particle* restrict p,
-    BE_ARGPTR_DEC double const* restrict beam_elements_buffer,
+DEMOTRACK_STATIC DEMOTRACK_FN void Track_particle_until_turn(
+    PARTICLE_ARGPTR_DEC Particle*  p,
+    BE_ARGPTR_DEC double const*  beam_elements_buffer,
     unsigned int const num_slots_in_beam_elements_buffer,
     long int const until_turn );
 
 /* ************************************************************************* */
 
-void Drift_track( BE_ARGPTR_DEC const Drift *const restrict drift,
-    PARTICLE_ARGPTR_DEC Particle* restrict p )
+DEMOTRACK_INLINE void Drift_track(
+    BE_ARGPTR_DEC const Drift *const  drift,
+    PARTICLE_ARGPTR_DEC Particle*  p )
 {
     double const one_plus_delta = p->delta + ( double )1;
     double const lpzi = ( double )1 / sqrt( one_plus_delta * one_plus_delta
@@ -58,7 +49,8 @@ void Drift_track( BE_ARGPTR_DEC const Drift *const restrict drift,
     p->zeta += p->rvv * drift->length - one_plus_delta * lpzi;
 }
 
-void LimitGlobal_track( PARTICLE_ARGPTR_DEC Particle* restrict p )
+DEMOTRACK_INLINE void LimitGlobal_track(
+    PARTICLE_ARGPTR_DEC Particle*  p )
 {
     double const sign_x = ( double )( ( ( double )0 < p->x ) -
                           ( double )( p->x < ( double )0 ) );
@@ -70,8 +62,9 @@ void LimitGlobal_track( PARTICLE_ARGPTR_DEC Particle* restrict p )
                               ( ( sign_y * p->y ) < ( double )1 ) );
 }
 
-void Multipole_track( BE_ARGPTR_DEC const Multipole *const restrict mp,
-    PARTICLE_ARGPTR_DEC Particle* restrict p )
+DEMOTRACK_INLINE void Multipole_track(
+    BE_ARGPTR_DEC const Multipole *const  mp,
+    PARTICLE_ARGPTR_DEC Particle*  p )
 {
     long int index_x = 2 * ( long int )mp->order;
     long int index_y = index_x + 1;
@@ -95,8 +88,9 @@ void Multipole_track( BE_ARGPTR_DEC const Multipole *const restrict mp,
     p->py += d_py;
 }
 
-void Cavity_track( BE_ARGPTR_DEC const Cavity *const restrict cavity,
-    PARTICLE_ARGPTR_DEC Particle* restrict p )
+DEMOTRACK_INLINE void Cavity_track(
+    BE_ARGPTR_DEC const Cavity *const  cavity,
+    PARTICLE_ARGPTR_DEC Particle*  p )
 {
     double const PI = ( double )3.141592653589793;
     double const phase = ( PI / ( double )180 ) * cavity->lag -
@@ -109,9 +103,9 @@ void Cavity_track( BE_ARGPTR_DEC const Cavity *const restrict cavity,
 
 /* ------------------------------------------------------------------------- */
 
-unsigned int Track_beam_element_dispatcher(
-    PARTICLE_ARGPTR_DEC Particle* restrict p,
-    BE_ARGPTR_DEC double const* restrict beam_elements_buffer,
+DEMOTRACK_INLINE unsigned int Track_beam_element_dispatcher(
+    PARTICLE_ARGPTR_DEC Particle*  p,
+    BE_ARGPTR_DEC double const*  beam_elements_buffer,
     unsigned int const current_slot_idx,
     unsigned int const num_slots_in_beam_elements_buffer )
 {
@@ -157,7 +151,7 @@ unsigned int Track_beam_element_dispatcher(
             break;
         }
 
-        #if defined( ENABLE_SPACECHARGE ) && ( ENABLE_SPACECHARGE == 1 )
+        #if defined( DISABLE_SPACECHARGE ) && ( DISABLE_SPACECHARGE == 0 )
         case BEAM_ELEMENT_SC_COASTING:
         {
             BE_ARGPTR_DEC SpaceChargeCoasting const* belem = ( BE_ARGPTR_DEC
@@ -168,7 +162,7 @@ unsigned int Track_beam_element_dispatcher(
             next_slot_idx += ( unsigned int )NUM_SLOTS_SC_COASTING;
             break;
         }
-        #endif /* defined( ENABLE_SPACECHARGE ) && ( ENABLE_SPACECHARGE == 1 ) */
+        #endif /* defined( DISABLE_SPACECHARGE ) && ( DISABLE_SPACECHARGE == 0 ) */
 
         default:
         {
@@ -188,8 +182,8 @@ unsigned int Track_beam_element_dispatcher(
     return next_slot_idx;
 }
 
-void Track_particle_until_turn( PARTICLE_ARGPTR_DEC Particle* restrict p,
-    BE_ARGPTR_DEC double const* restrict beam_elements_buffer,
+DEMOTRACK_INLINE void Track_particle_until_turn( PARTICLE_ARGPTR_DEC Particle*  p,
+    BE_ARGPTR_DEC double const*  beam_elements_buffer,
     unsigned int const num_slots_in_beam_elements_buffer,
     long int const until_turn )
 {
